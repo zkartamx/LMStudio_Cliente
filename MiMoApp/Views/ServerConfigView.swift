@@ -130,6 +130,7 @@ struct ServerConfigView: View {
                           : "xmark.octagon")
                     .foregroundColor(configVM.supportsImageInput ? .green : .red)
             }
+            Text("Versión: \(configVM.appVersion)")
         }
     }
 }
