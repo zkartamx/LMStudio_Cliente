@@ -245,6 +245,9 @@ struct ChatMessagesView: View {
 
 struct MessageBubble: View {
     let message: ChatMessage
+    private var maxBubbleWidth: CGFloat {
+        UIScreen.main.bounds.width * 0.75
+    }
     var body: some View {
         VStack(alignment: message.isUser ? .trailing : .leading,
                spacing: 8) {
@@ -263,13 +266,14 @@ struct MessageBubble: View {
             }
             if let text = message.text, !text.isEmpty {
                 Text(text)
+                    .textSelection(.enabled)
                     .padding(12)
                     .foregroundColor(message.isUser ? .white : .black)
                     .background(
                         message.isUser ? Color.blue : Color.white
                     )
                     .cornerRadius(16)
-                    .frame(maxWidth: 300,
+                    .frame(maxWidth: maxBubbleWidth,
                            alignment: message.isUser ? .trailing : .leading)
                     .shadow(color: .black.opacity(0.1), radius: 1, x: 0, y: 1)
             }
