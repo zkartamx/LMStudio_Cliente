@@ -236,20 +236,24 @@ struct PhotoPicker: UIViewControllerRepresentable {
 
 struct ChatMessagesView: View {
     let messages: [ChatMessage]
+
     var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                VStack(spacing: 12) {
-                    ForEach(messages) { msg in
-                        MessageBubble(message: msg)
+        GeometryReader { geo in
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: 12) {
+                        ForEach(messages) { msg in
+                            MessageBubble(message: msg,
+                                          maxBubbleWidth: geo.size.width * 0.75)
+                        }
                     }
+                    .padding()
                 }
-                .padding()
-            }
-            .onChange(of: messages.count) { _ in
-                if let last = messages.last?.id {
-                    withAnimation {
-                        proxy.scrollTo(last, anchor: .bottom)
+                .onChange(of: messages.count) { _ in
+                    if let last = messages.last?.id {
+                        withAnimation {
+                            proxy.scrollTo(last, anchor: .bottom)
+                        }
                     }
                 }
             }
@@ -259,9 +263,8 @@ struct ChatMessagesView: View {
 
 struct MessageBubble: View {
     let message: ChatMessage
-    private var maxBubbleWidth: CGFloat {
-        UIScreen.main.bounds.width * 0.75
-    }
+    let maxBubbleWidth: CGFloat
+
     var body: some View {
         VStack(alignment: message.isUser ? .trailing : .leading,
                spacing: 8) {
