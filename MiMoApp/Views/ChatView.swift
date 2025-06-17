@@ -38,8 +38,9 @@ struct ChatView: View {
                         .stroke(
                             style: StrokeStyle(lineWidth: 1, dash: [4])
                         )
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color(uiColor: .systemGray4))
                 )
+                .padding(.horizontal)
                 .layoutPriority(1)
 
             // — 2) Indicador de “Escribiendo…” mientras llegue streaming
@@ -246,7 +247,6 @@ struct ChatMessagesView: View {
                         MessageBubble(message: msg)
                     }
                 }
-                .padding(.horizontal)
             }
             .onChange(of: messages.count) { _ in
                 if let last = messages.last?.id {
@@ -262,7 +262,7 @@ struct ChatMessagesView: View {
 struct MessageBubble: View {
     let message: ChatMessage
     private var maxBubbleWidth: CGFloat {
-        UIScreen.main.bounds.width * 0.75
+        UIScreen.main.bounds.width - 32
     }
     var body: some View {
         VStack(alignment: message.isUser ? .trailing : .leading,
@@ -299,7 +299,6 @@ struct MessageBubble: View {
                alignment: message.isUser ? .trailing : .leading)
         .padding(message.isUser ? .leading : .trailing, 50)
         .padding(.vertical, 4)
-        .padding(.horizontal)
     }
 }
 
