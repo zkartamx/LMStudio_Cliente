@@ -265,10 +265,9 @@ struct MessageBubble: View {
                 }
             }
             if let text = message.text, !text.isEmpty {
-                Text(text)
-                    .textSelection(.enabled)
+                SelectableText(text: text,
+                               textColor: message.isUser ? .white : .black)
                     .padding(12)
-                    .foregroundColor(message.isUser ? .white : .black)
                     .background(
                         message.isUser ? Color.blue : Color.white
                     )
