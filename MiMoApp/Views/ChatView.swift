@@ -35,10 +35,7 @@ struct ChatView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .overlay(
                     RoundedRectangle(cornerRadius: 0)
-                        .stroke(
-                            style: StrokeStyle(lineWidth: 1, dash: [4])
-                        )
-                        .foregroundColor(Color(uiColor: .systemGray4))
+                        .stroke(Color(uiColor: .systemGray4), lineWidth: 1)
                 )
                 .padding(.horizontal)
                 .layoutPriority(1)
@@ -247,6 +244,7 @@ struct ChatMessagesView: View {
                         MessageBubble(message: msg)
                     }
                 }
+                .padding()
             }
             .onChange(of: messages.count) { _ in
                 if let last = messages.last?.id {
@@ -262,7 +260,7 @@ struct ChatMessagesView: View {
 struct MessageBubble: View {
     let message: ChatMessage
     private var maxBubbleWidth: CGFloat {
-        UIScreen.main.bounds.width - 32
+        UIScreen.main.bounds.width * 0.75
     }
     var body: some View {
         VStack(alignment: message.isUser ? .trailing : .leading,
@@ -297,7 +295,6 @@ struct MessageBubble: View {
                alignment: message.isUser ? .trailing : .leading)
         .frame(maxWidth: .infinity,
                alignment: message.isUser ? .trailing : .leading)
-        .padding(message.isUser ? .leading : .trailing, 50)
         .padding(.vertical, 4)
     }
 }
