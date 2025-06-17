@@ -11,7 +11,7 @@ import SwiftUI
 struct MiMoAppApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainView() // 👈 úsala directamente para pruebas
         }
     }
 }
