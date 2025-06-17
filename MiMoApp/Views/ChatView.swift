@@ -33,6 +33,13 @@ struct ChatView: View {
             // — 1) Lista de mensajes, ocupa todo el espacio disponible
             ChatMessagesView(messages: messages)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 0)
+                        .stroke(
+                            style: StrokeStyle(lineWidth: 1, dash: [4])
+                        )
+                        .foregroundColor(.secondary)
+                )
                 .layoutPriority(1)
 
             // — 2) Indicador de “Escribiendo…” mientras llegue streaming
