@@ -7,6 +7,8 @@ import UIKit
 struct ChatView: View {
     // 1) Binding de mensajes
     @Binding var messages: [ChatMessage]
+    // System prompt por pestaña
+    @Binding var systemPrompt: String
     // 2) ChatViewModel
     @StateObject private var viewModel: ChatViewModel
     // 3) ConfigVM compartido
@@ -15,16 +17,30 @@ struct ChatView: View {
     // Control para presentar el picker
     @State private var showingPhotoPicker = false
 
-    init(messages: Binding<[ChatMessage]>) {
-        _messages  = messages
-        _viewModel = StateObject(wrappedValue: ChatViewModel(bindingMessages: messages))
+    init(messages: Binding<[ChatMessage]>, systemPrompt: Binding<String>) {
+        _messages     = messages
+        _systemPrompt = systemPrompt
+        _viewModel    = StateObject(wrappedValue: ChatViewModel(bindingMessages: messages))
     }
 
     var body: some View {
         VStack(spacing: 0) {
+            TextField("System prompt…", text: $systemPrompt)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding(.horizontal)
+                .padding(.top, 8)
+
             // — 1) Lista de mensajes, ocupa todo el espacio disponible
             ChatMessagesView(messages: messages)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 0)
+                        .stroke(
+                            style: StrokeStyle(lineWidth: 1, dash: [4])
+                        )
+                        .foregroundColor(Color(uiColor: .systemGray4))
+                )
+                .padding(.horizontal)
                 .layoutPriority(1)
 
             // — 2) Indicador de “Escribiendo…” mientras llegue streaming
@@ -80,7 +96,8 @@ struct ChatView: View {
                     viewModel.sendPrompt(
                         model: configVM.selectedModel,
                         host:  configVM.address,
-                        port:  configVM.port
+                        port:  configVM.port,
+                        systemPrompt: systemPrompt
                     )
                 },
                 showImagePicker: {
@@ -230,7 +247,6 @@ struct ChatMessagesView: View {
                         MessageBubble(message: msg)
                     }
                 }
-                .padding()
             }
             .onChange(of: messages.count) { _ in
                 if let last = messages.last?.id {
@@ -245,6 +261,9 @@ struct ChatMessagesView: View {
 
 struct MessageBubble: View {
     let message: ChatMessage
+    private var maxBubbleWidth: CGFloat {
+        UIScreen.main.bounds.width - 32
+    }
     var body: some View {
         VStack(alignment: message.isUser ? .trailing : .leading,
                spacing: 8) {
@@ -262,23 +281,25 @@ struct MessageBubble: View {
                 }
             }
             if let text = message.text, !text.isEmpty {
-                Text(text)
+                SelectableText(text: text,
+                               textColor: message.isUser ? .white : .black)
                     .padding(12)
-                    .foregroundColor(message.isUser ? .white : .black)
                     .background(
                         message.isUser ? Color.blue : Color.white
                     )
                     .cornerRadius(16)
-                    .frame(maxWidth: 300,
+                    .frame(maxWidth: .infinity,
                            alignment: message.isUser ? .trailing : .leading)
                     .shadow(color: .black.opacity(0.1), radius: 1, x: 0, y: 1)
             }
         }
+        .frame(maxWidth: maxBubbleWidth,
+               alignment: message.isUser ? .trailing : .leading)
         .frame(maxWidth: .infinity,
                alignment: message.isUser ? .trailing : .leading)
         .padding(message.isUser ? .leading : .trailing, 50)
         .padding(.vertical, 4)
-        .padding(.horizontal)
     }
 }
+
 

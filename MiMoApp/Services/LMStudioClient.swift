@@ -17,6 +17,7 @@ class LMStudioClient {
         prompt: String,
         host: String,
         port: String,
+        systemPrompt: String,
         onUpdate: @escaping (String) -> Void,
         onFinish: @escaping () -> Void
     ) -> Task<Void, Never> {
@@ -29,12 +30,16 @@ class LMStudioClient {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
+        var messages: [[String: String]] = []
+        if !systemPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            messages.append(["role": "system", "content": systemPrompt])
+        }
+        messages.append(["role": "user", "content": prompt])
+
         let body: [String: Any] = [
             "model": model,
             "stream": true,
-            "messages": [
-                ["role": "user", "content": prompt]
-            ]
+            "messages": messages
         ]
 
         do {

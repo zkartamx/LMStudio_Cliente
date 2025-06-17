@@ -18,7 +18,7 @@ class ChatViewModel: ObservableObject {
     }
 
    
-    func sendPrompt(model: String, host: String, port: String) {
+    func sendPrompt(model: String, host: String, port: String, systemPrompt: String) {
         let input = userInput.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !input.isEmpty else { return }
 
@@ -49,6 +49,7 @@ class ChatViewModel: ObservableObject {
                 prompt: promptText,
                 host: host,
                 port: port,
+                systemPrompt: systemPrompt,
                 onUpdate: { [weak self] partial in
                     Task { @MainActor in
                         guard let self = self, let idx = self.lastBotMessageIndex else { return }
@@ -72,7 +73,8 @@ class ChatViewModel: ObservableObject {
                 prompt: promptText,
                 model: model,
                 host: host,
-                port: port
+                port: port,
+                systemPrompt: systemPrompt
             ) { [weak self] response in
                 Task { @MainActor in
                     guard let self = self, let idx = self.lastBotMessageIndex else { return }
@@ -98,6 +100,7 @@ class ChatViewModel: ObservableObject {
         model: String,
         host: String,
         port: String,
+        systemPrompt: String,
         completion: @escaping (String?) -> Void
     ) {
         guard let url = URL(string: "http://\(host):\(port)/v1/chat/completions") else {
@@ -114,14 +117,18 @@ class ChatViewModel: ObservableObject {
             ]
         }
 
+        var messages: [[String: Any]] = []
+        if !systemPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            messages.append(["role": "system", "content": systemPrompt])
+        }
+        messages.append([
+            "role": "user",
+            "content": imageContents + [["type": "text", "text": prompt]]
+        ])
+
         let body: [String: Any] = [
             "model": model,
-            "messages": [
-                [
-                    "role": "user",
-                    "content": imageContents + [["type": "text", "text": prompt]]
-                ]
-            ],
+            "messages": messages,
             "temperature": 0.7,
             "max_tokens": -1,
             "stream": false

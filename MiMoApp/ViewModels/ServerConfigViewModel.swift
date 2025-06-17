@@ -8,6 +8,7 @@ class ServerConfigViewModel: ObservableObject {
     @Published var address = UserDefaults.standard.string(forKey: "lmHost") ?? ""
     @Published var port = UserDefaults.standard.string(forKey: "lmPort") ?? ""
     @Published var supportsImageInput: Bool = false
+    @Published var appVersion: String = "0.0.4"
 
     // MARK: — Modelos
     @Published var models = UserDefaults.standard.stringArray(forKey: "lmModels") ?? []

@@ -9,43 +9,55 @@ struct MainView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // — Pestañas superiores
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(convVM.conversations.indices, id: \.self) { index in
-                        Button {
-                            convVM.currentConversationIndex = index
-                        } label: {
-                            Text(convVM.conversations[index].name)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(
-                                    index == convVM.currentConversationIndex
-                                        ? Color.gray
-                                        : Color.secondary.opacity(0.2)
-                                )
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
-                        }
-                        .contextMenu {
-                            Button(role: .destructive) {
-                                convVM.deleteConversation(at: index)
+            // — Pestañas superiores con botón de configuración
+            ZStack(alignment: .topTrailing) {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(convVM.conversations.indices, id: \.self) { index in
+                            Button {
+                                convVM.currentConversationIndex = index
                             } label: {
-                                Label("Eliminar conversación", systemImage: "trash")
+                                Text(convVM.conversations[index].name)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(
+                                        index == convVM.currentConversationIndex
+                                            ? Color.gray
+                                            : Color.secondary.opacity(0.2)
+                                    )
+                                    .foregroundColor(.white)
+                                    .cornerRadius(10)
+                            }
+                            .contextMenu {
+                                Button(role: .destructive) {
+                                    convVM.deleteConversation(at: index)
+                                } label: {
+                                    Label("Eliminar conversación", systemImage: "trash")
+                                }
                             }
                         }
-                    }
 
-                    Button {
-                        convVM.addNewConversation()
-                    } label: {
-                        Image(systemName: "plus")
-                            .padding(8)
-                            .background(Color.secondary.opacity(0.3))
-                            .cornerRadius(8)
+                        Button {
+                            convVM.addNewConversation()
+                        } label: {
+                            Image(systemName: "plus")
+                                .padding(8)
+                                .background(Color.secondary.opacity(0.3))
+                                .cornerRadius(8)
+                        }
                     }
+                    .padding(.leading)
+                    .padding(.trailing, 60)
+                    .padding(.top, 10)
                 }
-                .padding(.horizontal)
+
+                Button {
+                    showingConfig.toggle()
+                } label: {
+                    Image(systemName: "gearshape")
+                        .padding(10)
+                }
+                .padding(.trailing)
                 .padding(.top, 10)
             }
 
@@ -58,22 +70,18 @@ struct MainView: View {
                     $convVM
                         .conversations[convVM.currentConversationIndex]
                         .messages
+                let systemPromptBinding =
+                    $convVM
+                        .conversations[convVM.currentConversationIndex]
+                        .systemPrompt
 
                 // 2) Forzamos remount de ChatView al cambiar de modelo O de pestaña
                 Group {
-                    ChatView(messages: messagesBinding)
+                    ChatView(messages: messagesBinding,
+                             systemPrompt: systemPromptBinding)
                 }
                 .id("\(configVM.selectedModel)-\(convVM.currentConversationIndex)")
                 .environmentObject(configVM)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button {
-                            showingConfig.toggle()
-                        } label: {
-                            Image(systemName: "gearshape")
-                        }
-                    }
-                }
             }
             .navigationViewStyle(.stack)  // evita caching en iPad
         }
