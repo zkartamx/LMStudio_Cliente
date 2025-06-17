@@ -7,6 +7,8 @@ import UIKit
 struct ChatView: View {
     // 1) Binding de mensajes
     @Binding var messages: [ChatMessage]
+    // System prompt por pestaña
+    @Binding var systemPrompt: String
     // 2) ChatViewModel
     @StateObject private var viewModel: ChatViewModel
     // 3) ConfigVM compartido
@@ -15,13 +17,19 @@ struct ChatView: View {
     // Control para presentar el picker
     @State private var showingPhotoPicker = false
 
-    init(messages: Binding<[ChatMessage]>) {
-        _messages  = messages
-        _viewModel = StateObject(wrappedValue: ChatViewModel(bindingMessages: messages))
+    init(messages: Binding<[ChatMessage]>, systemPrompt: Binding<String>) {
+        _messages     = messages
+        _systemPrompt = systemPrompt
+        _viewModel    = StateObject(wrappedValue: ChatViewModel(bindingMessages: messages))
     }
 
     var body: some View {
         VStack(spacing: 0) {
+            TextField("System prompt…", text: $systemPrompt)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding(.horizontal)
+                .padding(.top, 8)
+
             // — 1) Lista de mensajes, ocupa todo el espacio disponible
             ChatMessagesView(messages: messages)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -80,7 +88,8 @@ struct ChatView: View {
                     viewModel.sendPrompt(
                         model: configVM.selectedModel,
                         host:  configVM.address,
-                        port:  configVM.port
+                        port:  configVM.port,
+                        systemPrompt: systemPrompt
                     )
                 },
                 showImagePicker: {
