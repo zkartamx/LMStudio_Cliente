@@ -46,7 +46,8 @@ struct MainView: View {
                                 .cornerRadius(8)
                         }
                     }
-                    .padding(.horizontal)
+                    .padding(.leading)
+                    .padding(.trailing, 60)
                     .padding(.top, 10)
                 }
 

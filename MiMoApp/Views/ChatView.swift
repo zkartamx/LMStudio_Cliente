@@ -239,7 +239,7 @@ struct ChatMessagesView: View {
                         MessageBubble(message: msg)
                     }
                 }
-                .padding()
+                .padding(.horizontal)
             }
             .onChange(of: messages.count) { _ in
                 if let last = messages.last?.id {
