@@ -289,14 +289,12 @@ struct MessageBubble: View {
                         message.isUser ? Color.blue : Color.white
                     )
                     .cornerRadius(16)
-                    .frame(maxWidth: .infinity,
-                           alignment: message.isUser ? .trailing : .leading)
                     .shadow(color: .black.opacity(0.1), radius: 1, x: 0, y: 1)
             }
         }
-        .frame(maxWidth: maxBubbleWidth,
-               alignment: message.isUser ? .trailing : .leading)
         .frame(maxWidth: .infinity,
+               alignment: message.isUser ? .trailing : .leading)
+        .frame(maxWidth: maxBubbleWidth,
                alignment: message.isUser ? .trailing : .leading)
         .padding(.vertical, 4)
     }
