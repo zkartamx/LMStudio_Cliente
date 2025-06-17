@@ -265,9 +265,10 @@ struct MessageBubble: View {
                 }
             }
             if let text = message.text, !text.isEmpty {
-                SelectableText(text: text,
-                               textColor: message.isUser ? .white : .black)
+                Text(text)
+                    .textSelection(.enabled)
                     .padding(12)
+                    .foregroundColor(message.isUser ? .white : .black)
                     .background(
                         message.isUser ? Color.blue : Color.white
                     )
@@ -287,27 +288,4 @@ struct MessageBubble: View {
     }
 }
 
-struct SelectableText: UIViewRepresentable {
-    let text: String
-    var textColor: UIColor = .label
-
-    func makeUIView(context: Context) -> UITextView {
-        let tv = UITextView()
-        tv.backgroundColor = .clear
-        tv.isEditable = false
-        tv.isSelectable = true
-        tv.isScrollEnabled = false
-        tv.textContainerInset = .zero
-        tv.textContainer.lineFragmentPadding = 0
-        tv.font = UIFont.preferredFont(forTextStyle: .body)
-        tv.text = text
-        tv.textColor = textColor
-        return tv
-    }
-
-    func updateUIView(_ uiView: UITextView, context: Context) {
-        uiView.text = text
-        uiView.textColor = textColor
-    }
-}
 
