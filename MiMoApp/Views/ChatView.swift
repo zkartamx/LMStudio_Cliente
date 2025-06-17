@@ -245,6 +245,9 @@ struct ChatMessagesView: View {
 
 struct MessageBubble: View {
     let message: ChatMessage
+    private var maxBubbleWidth: CGFloat {
+        UIScreen.main.bounds.width * 0.75
+    }
     var body: some View {
         VStack(alignment: message.isUser ? .trailing : .leading,
                spacing: 8) {
@@ -262,23 +265,49 @@ struct MessageBubble: View {
                 }
             }
             if let text = message.text, !text.isEmpty {
-                Text(text)
+                SelectableText(text: text,
+                               textColor: message.isUser ? .white : .black)
                     .padding(12)
-                    .foregroundColor(message.isUser ? .white : .black)
                     .background(
                         message.isUser ? Color.blue : Color.white
                     )
                     .cornerRadius(16)
-                    .frame(maxWidth: 300,
+                    .frame(maxWidth: .infinity,
                            alignment: message.isUser ? .trailing : .leading)
                     .shadow(color: .black.opacity(0.1), radius: 1, x: 0, y: 1)
             }
         }
+        .frame(maxWidth: maxBubbleWidth,
+               alignment: message.isUser ? .trailing : .leading)
         .frame(maxWidth: .infinity,
                alignment: message.isUser ? .trailing : .leading)
         .padding(message.isUser ? .leading : .trailing, 50)
         .padding(.vertical, 4)
         .padding(.horizontal)
+    }
+}
+
+struct SelectableText: UIViewRepresentable {
+    let text: String
+    var textColor: UIColor = .label
+
+    func makeUIView(context: Context) -> UITextView {
+        let tv = UITextView()
+        tv.backgroundColor = .clear
+        tv.isEditable = false
+        tv.isSelectable = true
+        tv.isScrollEnabled = false
+        tv.textContainerInset = .zero
+        tv.textContainer.lineFragmentPadding = 0
+        tv.font = UIFont.preferredFont(forTextStyle: .body)
+        tv.text = text
+        tv.textColor = textColor
+        return tv
+    }
+
+    func updateUIView(_ uiView: UITextView, context: Context) {
+        uiView.text = text
+        uiView.textColor = textColor
     }
 }
 
