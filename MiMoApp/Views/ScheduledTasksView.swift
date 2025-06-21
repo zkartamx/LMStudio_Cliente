@@ -44,6 +44,7 @@ struct ScheduledTasksView: View {
                                         Text(log)
                                             .font(.caption2)
                                             .foregroundColor(.green)
+                                            .textSelection(.enabled)
                                     }
                                 }
 
