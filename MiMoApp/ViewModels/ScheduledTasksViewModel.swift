@@ -4,6 +4,9 @@ import SwiftUI
 @MainActor
 class ScheduledTasksViewModel: ObservableObject {
     @Published var tasks: [ScheduledTask] = []
+    var hasPendingImageTask: Bool {
+        tasks.contains { $0.executedAt == nil && !$0.imageDatas.isEmpty }
+    }
 
     private var timer: Timer?
     private weak var configVM: ServerConfigViewModel?
@@ -18,8 +21,8 @@ class ScheduledTasksViewModel: ObservableObject {
         timer?.invalidate()
     }
 
-    func addTask(name: String, date: Date, prompt: String) {
-        let task = ScheduledTask(name: name, runDate: date, prompt: prompt)
+    func addTask(name: String, date: Date, prompt: String, images: [Data] = []) {
+        let task = ScheduledTask(name: name, runDate: date, prompt: prompt, imageDatas: images)
         tasks.append(task)
         save()
     }
@@ -47,7 +50,15 @@ class ScheduledTasksViewModel: ObservableObject {
             guard task.executedAt == nil, task.runDate <= now else { continue }
 
             var response: String? = nil
-            if !task.prompt.isEmpty {
+            if !task.imageDatas.isEmpty {
+                response = await LMStudioClient.sendPromptWithImagesOnce(
+                    to: config.selectedModel,
+                    prompt: task.prompt,
+                    imageDatas: task.imageDatas,
+                    host: config.address,
+                    port: config.port
+                )
+            } else if !task.prompt.isEmpty {
                 response = await LMStudioClient.sendPromptOnce(
                     to: config.selectedModel,
                     prompt: task.prompt,

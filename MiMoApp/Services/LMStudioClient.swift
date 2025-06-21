@@ -116,5 +116,63 @@ class LMStudioClient {
 
         return nil
     }
+
+    /// Envía un prompt con imágenes y devuelve la respuesta completa.
+    static func sendPromptWithImagesOnce(
+        to model: String,
+        prompt: String,
+        imageDatas: [Data],
+        host: String,
+        port: String
+    ) async -> String? {
+        guard let url = URL(string: "http://\(host):\(port)/v1/chat/completions") else {
+            return nil
+        }
+
+        let imageContents: [[String: Any]] = imageDatas.map { data in
+            let base64 = data.base64EncodedString()
+            return [
+                "type": "image_url",
+                "image_url": ["url": "data:image/jpeg;base64,\(base64)"]
+            ]
+        }
+
+        let body: [String: Any] = [
+            "model": model,
+            "messages": [
+                [
+                    "role": "user",
+                    "content": imageContents + [["type": "text", "text": prompt]]
+                ]
+            ],
+            "temperature": 0.7,
+            "max_tokens": -1,
+            "stream": false
+        ] as [String : Any]
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        } catch {
+            return nil
+        }
+
+        do {
+            let (data, _) = try await URLSession.shared.data(for: request)
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let choices = json["choices"] as? [[String: Any]],
+               let message = choices.first?["message"] as? [String: Any],
+               let content = message["content"] as? String {
+                return content
+            }
+        } catch {
+            return nil
+        }
+
+        return nil
+    }
 }
 

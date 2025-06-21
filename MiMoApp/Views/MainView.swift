@@ -74,6 +74,7 @@ struct MainView: View {
                         } label: {
                             Image(systemName: "gearshape")
                         }
+                        .disabled(tasksVM.hasPendingImageTask)
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
@@ -89,10 +90,12 @@ struct MainView: View {
         .sheet(isPresented: $showingConfig) {
             ServerConfigView()
                 .environmentObject(configVM)
+                .environmentObject(tasksVM)
         }
         .sheet(isPresented: $showingTasks) {
             ScheduledTasksView()
                 .environmentObject(tasksVM)
+                .environmentObject(configVM)
         }
         .onAppear {
             tasksVM.startMonitoring(config: configVM)
