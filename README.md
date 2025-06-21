@@ -31,7 +31,7 @@ MiMoApp es un cliente iOS basado en SwiftUI que permite interactuar con un servi
 2. Pulsa **Recuperar modelos** para obtener la lista disponible y elige uno de ellos.
 3. Vuelve a la pantalla principal y comienza a chatear. Si el modelo admite imágenes podrás seleccionarlas desde la cámara o la galería.
 4. Puedes crear nuevas conversaciones, cambiar de modelo en cualquier momento o detener la respuesta en curso.
-5. Accede al apartado de **tareas programadas** para añadir acciones automáticas eligiendo la fecha y hora de ejecución. Las tareas finalizadas mostrarán una palomita verde, podrás revisar el texto devuelto por el modelo y seleccionar dicho registro para copiarlo.
+5. Accede al apartado de **tareas programadas** para añadir acciones automáticas eligiendo la fecha y hora de ejecución. Las tareas finalizadas mostrarán una palomita verde y guardan el texto devuelto por el modelo. Dicha respuesta es seleccionable y también puedes copiarla desde su menú contextual.
 
 ## Pruebas
 

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct ScheduledTasksView: View {
     @EnvironmentObject private var tasksVM: ScheduledTasksViewModel
@@ -45,6 +46,13 @@ struct ScheduledTasksView: View {
                                             .font(.caption2)
                                             .foregroundColor(.green)
                                             .textSelection(.enabled)
+                                            .contextMenu {
+                                                Button {
+                                                    UIPasteboard.general.string = log
+                                                } label: {
+                                                    Label("Copiar", systemImage: "doc.on.doc")
+                                                }
+                                            }
                                     }
                                 }
 
