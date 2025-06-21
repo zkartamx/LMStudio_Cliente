@@ -5,7 +5,9 @@ import PhotosUI
 struct MainView: View {
     @StateObject private var convVM   = ConversationsViewModel()
     @StateObject private var configVM = ServerConfigViewModel()
+    @StateObject private var tasksVM  = ScheduledTasksViewModel()
     @State private   var showingConfig = false
+    @State private   var showingTasks  = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -73,6 +75,13 @@ struct MainView: View {
                             Image(systemName: "gearshape")
                         }
                     }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button {
+                            showingTasks.toggle()
+                        } label: {
+                            Image(systemName: "clock.arrow.circlepath")
+                        }
+                    }
                 }
             }
             .navigationViewStyle(.stack)  // evita caching en iPad
@@ -80,6 +89,10 @@ struct MainView: View {
         .sheet(isPresented: $showingConfig) {
             ServerConfigView()
                 .environmentObject(configVM)
+        }
+        .sheet(isPresented: $showingTasks) {
+            ScheduledTasksView()
+                .environmentObject(tasksVM)
         }
     }
 }
