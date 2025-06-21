@@ -94,6 +94,9 @@ struct MainView: View {
             ScheduledTasksView()
                 .environmentObject(tasksVM)
         }
+        .onAppear {
+            tasksVM.startMonitoring(config: configVM)
+        }
     }
 }
 

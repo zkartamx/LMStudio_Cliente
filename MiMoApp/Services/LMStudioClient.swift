@@ -72,5 +72,49 @@ class LMStudioClient {
 
         return task
     }
+
+    /// Envía un prompt de texto y devuelve la respuesta completa de forma síncrona.
+    static func sendPromptOnce(
+        to model: String,
+        prompt: String,
+        host: String,
+        port: String
+    ) async -> String? {
+        guard let url = URL(string: "http://\(host):\(port)/v1/chat/completions") else {
+            return nil
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = [
+            "model": model,
+            "stream": false,
+            "messages": [
+                ["role": "user", "content": prompt]
+            ]
+        ]
+
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        } catch {
+            return nil
+        }
+
+        do {
+            let (data, _) = try await URLSession.shared.data(for: request)
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let choices = json["choices"] as? [[String: Any]],
+               let message = choices.first?["message"] as? [String: Any],
+               let content = message["content"] as? String {
+                return content
+            }
+        } catch {
+            return nil
+        }
+
+        return nil
+    }
 }
 
