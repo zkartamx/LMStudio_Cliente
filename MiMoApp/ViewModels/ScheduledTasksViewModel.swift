@@ -11,8 +11,8 @@ class ScheduledTasksViewModel: ObservableObject {
         load()
     }
 
-    func addTask(name: String, schedule: String, prompt: String) {
-        let task = ScheduledTask(name: name, schedule: schedule, prompt: prompt)
+    func addTask(name: String, date: Date, prompt: String) {
+        let task = ScheduledTask(name: name, runDate: date, prompt: prompt)
         tasks.append(task)
         save()
     }

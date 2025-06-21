@@ -5,7 +5,7 @@ struct ScheduledTasksView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var name = ""
-    @State private var schedule = ""
+    @State private var runDate = Date()
     @State private var prompt = ""
 
     var body: some View {
@@ -13,13 +13,13 @@ struct ScheduledTasksView: View {
             Form {
                 Section(header: Text("Nueva tarea")) {
                     TextField("Nombre", text: $name)
-                    TextField("Cron", text: $schedule)
+                    DatePicker("Fecha y hora", selection: $runDate, displayedComponents: [.date, .hourAndMinute])
                     TextField("Prompt", text: $prompt)
                     Button("Agregar") {
-                        guard !name.isEmpty, !schedule.isEmpty else { return }
-                        tasksVM.addTask(name: name, schedule: schedule, prompt: prompt)
+                        guard !name.isEmpty else { return }
+                        tasksVM.addTask(name: name, date: runDate, prompt: prompt)
                         name = ""
-                        schedule = ""
+                        runDate = Date()
                         prompt = ""
                     }
                 }
@@ -32,7 +32,7 @@ struct ScheduledTasksView: View {
                         ForEach(tasksVM.tasks) { task in
                             VStack(alignment: .leading) {
                                 Text(task.name)
-                                Text(task.schedule)
+                                Text(task.runDate.formatted(date: .abbreviated, time: .shortened))
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                                 if !task.prompt.isEmpty {
