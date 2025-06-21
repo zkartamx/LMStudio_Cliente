@@ -41,21 +41,26 @@ class ScheduledTasksViewModel: ObservableObject {
     private func checkDueTasks() async {
         guard let config = configVM else { return }
         let now = Date()
-        let due = tasks.filter { $0.runDate <= now }
-        guard !due.isEmpty else { return }
 
-        for task in due {
+        for index in tasks.indices {
+            var task = tasks[index]
+            guard task.executedAt == nil, task.runDate <= now else { continue }
+
+            var response: String? = nil
             if !task.prompt.isEmpty {
-                _ = await LMStudioClient.sendPromptOnce(
+                response = await LMStudioClient.sendPromptOnce(
                     to: config.selectedModel,
                     prompt: task.prompt,
                     host: config.address,
                     port: config.port
                 )
             }
+
+            task.executedAt = Date()
+            task.responseLog = response
+            tasks[index] = task
         }
 
-        tasks.removeAll { $0.runDate <= now }
         save()
     }
 

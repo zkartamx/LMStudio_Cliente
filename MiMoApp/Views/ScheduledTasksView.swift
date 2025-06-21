@@ -30,14 +30,28 @@ struct ScheduledTasksView: View {
                             .foregroundColor(.secondary)
                     } else {
                         ForEach(tasksVM.tasks) { task in
-                            VStack(alignment: .leading) {
-                                Text(task.name)
-                                Text(task.runDate.formatted(date: .abbreviated, time: .shortened))
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                if !task.prompt.isEmpty {
-                                    Text(task.prompt)
+                            HStack(alignment: .top) {
+                                VStack(alignment: .leading) {
+                                    Text(task.name)
+                                    Text(task.runDate.formatted(date: .abbreviated, time: .shortened))
                                         .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    if !task.prompt.isEmpty {
+                                        Text(task.prompt)
+                                            .font(.caption)
+                                    }
+                                    if let log = task.responseLog {
+                                        Text(log)
+                                            .font(.caption2)
+                                            .foregroundColor(.green)
+                                    }
+                                }
+
+                                Spacer()
+
+                                if task.executedAt != nil {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.green)
                                 }
                             }
                         }
