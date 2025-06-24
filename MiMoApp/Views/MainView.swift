@@ -5,7 +5,9 @@ import PhotosUI
 struct MainView: View {
     @StateObject private var convVM   = ConversationsViewModel()
     @StateObject private var configVM = ServerConfigViewModel()
+    @StateObject private var tasksVM  = ScheduledTasksViewModel()
     @State private   var showingConfig = false
+    @State private   var showingTasks  = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -72,6 +74,14 @@ struct MainView: View {
                         } label: {
                             Image(systemName: "gearshape")
                         }
+                        .disabled(tasksVM.hasPendingImageTask)
+                    }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button {
+                            showingTasks.toggle()
+                        } label: {
+                            Image(systemName: "clock.arrow.circlepath")
+                        }
                     }
                 }
             }
@@ -80,6 +90,15 @@ struct MainView: View {
         .sheet(isPresented: $showingConfig) {
             ServerConfigView()
                 .environmentObject(configVM)
+                .environmentObject(tasksVM)
+        }
+        .sheet(isPresented: $showingTasks) {
+            ScheduledTasksView()
+                .environmentObject(tasksVM)
+                .environmentObject(configVM)
+        }
+        .onAppear {
+            tasksVM.startMonitoring(config: configVM)
         }
     }
 }

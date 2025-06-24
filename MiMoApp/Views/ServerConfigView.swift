@@ -4,6 +4,7 @@ import SwiftUI
 struct ServerConfigView: View {
     // ① Usa el mismo VM que viene de MainView
     @EnvironmentObject private var configVM: ServerConfigViewModel
+    @EnvironmentObject private var tasksVM: ScheduledTasksViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var showDeleteAlert = false
 
@@ -66,7 +67,10 @@ struct ServerConfigView: View {
     // MARK: – Modelos
     private var modelsSection: some View {
         Section(header: Text("Modelos encontrados")) {
-            if configVM.isLoading {
+            if tasksVM.hasPendingImageTask {
+                Text("No puedes cambiar de modelo hasta que finalicen las tareas con imágenes")
+                    .foregroundColor(.secondary)
+            } else if configVM.isLoading {
                 ProgressView("Cargando modelos…")
             } else if configVM.models.isEmpty {
                 Text("Pulsa 'Recuperar modelos'")
@@ -92,6 +96,7 @@ struct ServerConfigView: View {
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
+                        guard !tasksVM.hasPendingImageTask else { return }
                         configVM.selectedModel = model
                     }
                 }
@@ -100,7 +105,7 @@ struct ServerConfigView: View {
             Button("Recuperar modelos") {
                 Task { await configVM.fetchModels() }
             }
-            .disabled(configVM.isLoading)
+            .disabled(configVM.isLoading || tasksVM.hasPendingImageTask)
         }
     }
 
