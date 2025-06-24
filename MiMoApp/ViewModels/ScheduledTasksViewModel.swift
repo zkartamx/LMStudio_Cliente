@@ -45,9 +45,12 @@ class ScheduledTasksViewModel: ObservableObject {
         guard let config = configVM else { return }
         let now = Date()
 
-        for index in tasks.indices {
-            var task = tasks[index]
+        let currentTasks = tasks
+
+        for task in currentTasks {
             guard task.executedAt == nil, task.runDate <= now else { continue }
+
+            var updatedTask = task
 
             var response: String? = nil
             if !task.imageDatas.isEmpty {
@@ -67,9 +70,12 @@ class ScheduledTasksViewModel: ObservableObject {
                 )
             }
 
-            task.executedAt = Date()
-            task.responseLog = response
-            tasks[index] = task
+            updatedTask.executedAt = Date()
+            updatedTask.responseLog = response
+
+            if let idx = tasks.firstIndex(where: { $0.id == task.id }) {
+                tasks[idx] = updatedTask
+            }
         }
 
         save()
